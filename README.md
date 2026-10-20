@@ -36,7 +36,7 @@ The home page and all eight project detail pages are prerendered. `typecheck` ge
 | `src/data/types.ts` | Shared content types |
 | `src/data/editorial.ts` | Headings, hero copy, contact invitation, display names |
 
-Email, X, and portrait are deliberately `null`. Unconfirmed project technologies, images, and case studies are empty arrays; project/repository links are omitted unless supplied. Missing links and case-study sections are omitted. Add actual values to enable them. All featured projects and the three additional projects have functional local detail pages.
+Official email and X links are configured in `socials.ts`; the optional portrait remains `null`. Unconfirmed project technologies, images, and case studies are empty arrays; project/repository links are omitted unless supplied. Missing links and case-study sections are omitted. Add actual values to enable them. All featured projects and the three additional projects have functional local detail pages.
 
 ### Add a project or a case study
 
@@ -86,7 +86,7 @@ For your portrait, add `public/images/portrait.webp` and set `profile.portrait` 
 - `src/components/navigation.tsx`: compact navigation, mobile focus loop, Escape support, background `inert`, scroll lock.
 - `src/app/work/[slug]/page.tsx`: all eight project routes, optional verified links, real screenshots when supplied, editable case studies, and next-project navigation.
 
-The WebGL renderer caps DPR at 1.4. Each visible scene uses one draw call. The membrane uses a 260 × 100 segment plane; the figure uses `THREE.Points`. Off-screen and hidden-tab scenes stop continuous rendering. Reduced-motion mode renders a static frame and disables smooth scrolling and UI transitions. SVG fallbacks remain for graphics failures. Slow hover effects use CSS transforms.
+The WebGL renderer caps DPR at 1.4. Each visible scene uses one draw call. The membrane uses a 260 × 100 segment plane; the figure uses `THREE.Points`. Off-screen and hidden-tab scenes stop continuous rendering. Scissor clipping skips horizontally hidden pixels and CSS-clipped canvas areas without changing camera framing, shader, lighting, geometry, DPR, or particle count. Scroll measurements are coalesced into one animation frame and cleaned up on unmount. Reduced-motion mode renders a static frame and disables smooth scrolling and UI transitions. SVG fallbacks remain for graphics failures. Slow hover effects use CSS transforms.
 
 ### Imagery and provenance
 
@@ -130,3 +130,7 @@ Open Graph artwork is generated at `/opengraph-image`. Page titles/descriptions 
 - Procedural material shading can differ slightly across GPUs. The fallback remains available for unsupported browsers and graphics failures.
 
 Before sharing publicly, add your portrait/contact details if desired, confirm project URLs, and set the canonical URL. No missing personal facts have been invented.
+
+## Mobile and performance polish
+
+See [POLISH-REPORT.md](./POLISH-REPORT.md) for the targeted responsive fixes, desktop comparison, production measurements, and verification limits.

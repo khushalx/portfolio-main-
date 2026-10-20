@@ -3,9 +3,22 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, type RefObject } from "react";
 import * as THREE from "three";
-import type { SceneMode } from "./atmospheric-scene";
+import type { RenderRegion, SceneMode } from "./atmospheric-scene";
 
-type SceneProps = { mode: SceneMode; reduced: boolean; active: boolean; progress: RefObject<number>; onReady: () => void; onFailure: () => void };
+type SceneProps = { mode: SceneMode; reduced: boolean; active: boolean; progress: RefObject<number>; region: RefObject<RenderRegion>; onReady: () => void; onFailure: () => void };
+
+// Keep the original camera and resolution; skip fragments hidden by CSS clipping
+// or outside the viewport. The DOM region is measured only on scroll/resize.
+function VisibleRegion({ region, reduced }: Pick<SceneProps, "region" | "reduced">) {
+  useFrame(({ gl }) => {
+    // A reduced-motion scene renders once, including portions revealed later.
+    if (reduced) { gl.setScissorTest(false); return; }
+    const { x, y, width, height } = region.current;
+    gl.setScissor(x, y, width, height);
+    gl.setScissorTest(true);
+  }, -1);
+  return null;
+}
 
 const membraneVertex = `
   uniform float uTime;
@@ -88,7 +101,7 @@ const membraneFragment = `
 
 function Membrane({ mode, reduced, progress }: Pick<SceneProps, "mode" | "reduced" | "progress">) {
   const material = useRef<THREE.ShaderMaterial>(null);
-  const { viewport } = useThree();
+  const viewport = useThree(state => state.viewport);
   const uniforms = useMemo(() => ({ uTime: { value: 1.7 }, uScroll: { value: 0 }, uPointer: { value: new THREE.Vector2() }, uCurtain: { value: mode === "curtain" ? 1 : 0 } }), [mode]);
   const elapsed = useRef(1.7);
   useFrame((state, dt) => {
@@ -203,7 +216,7 @@ function Figure({ reduced, progress }: Pick<SceneProps, "reduced" | "progress">)
 }
 
 function ContextHealth({ onReady, onFailure }: Pick<SceneProps, "onReady" | "onFailure">) {
-  const { gl } = useThree();
+  const gl = useThree(state => state.gl);
   useEffect(() => {
     let frame2 = 0;
     const frame = requestAnimationFrame(() => { frame2 = requestAnimationFrame(onReady); });
@@ -216,6 +229,7 @@ function ContextHealth({ onReady, onFailure }: Pick<SceneProps, "onReady" | "onF
 
 export default function AtmosphereCanvas(props: SceneProps) {
   return <Canvas camera={{ position: [0, 0, props.mode === "particles" ? 7.7 : 9.5], fov: 38 }} dpr={[1, 1.4]} frameloop={props.active && !props.reduced ? "always" : "demand"} gl={{ alpha: true, antialias: true, powerPreference: "low-power" }} fallback={<span />}>
+    <VisibleRegion region={props.region} reduced={props.reduced} />
     <ContextHealth onReady={props.onReady} onFailure={props.onFailure} />
     {props.mode === "particles" ? <Figure reduced={props.reduced} progress={props.progress} /> : <Membrane mode={props.mode} reduced={props.reduced} progress={props.progress} />}
   </Canvas>;

@@ -6,7 +6,7 @@ import { Reveal } from "./motion";
 
 export function Work() {
   return <section id="work" className="work section-space" aria-labelledby="work-title">
-    <Reveal className="section-heading"><h2 id="work-title">WORK<span className="heading-count"> / 08</span></h2><p>Selected projects across<br />software, AI, and finance.</p></Reveal>
+    <Reveal className="section-heading"><h2 id="work-title">WORK<span className="heading-count"> / 08</span></h2><p>Selected projects across<br />{ " " }software, AI, and finance.</p></Reveal>
     <div className="project-gallery">{projects.filter(p => p.featured).map(project => <Reveal className={`exhibition exhibition-${project.cover}`} key={project.slug}>
       <div className="project-heading"><div className="project-identity"><span className="project-number">{project.id}</span><h3><Link href={`/work/${project.slug}`}>{project.title}</Link></h3></div><span className="project-category">{project.category}</span></div>
       <Link className="project-link" href={`/work/${project.slug}`} aria-label={`View ${project.title} project`}><ProjectCover project={project} /></Link>
