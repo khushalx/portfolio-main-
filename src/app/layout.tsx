@@ -3,6 +3,7 @@ import "@fontsource/archivo-black";
 import "@fontsource-variable/space-grotesk";
 import "./globals.css";
 import { ScrollProgress } from "@/components/motion";
+import { Analytics } from "@vercel/analytics/next";
 
 const origin = process.env.NEXT_PUBLIC_SITE_URL;
 export const metadata: Metadata = {
@@ -17,5 +18,5 @@ export const metadata: Metadata = {
 };
 export const viewport: Viewport = { themeColor: "#050505", colorScheme: "dark" };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en" data-scroll-behavior="smooth"><body><a className="skip-link" href="#main">Skip to content</a><ScrollProgress />{children}</body></html>;
+  return <html lang="en" data-scroll-behavior="smooth"><body><a className="skip-link" href="#main">Skip to content</a><ScrollProgress />{children}<Analytics /></body></html>;
 }
